@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 )
 
 type DictRequest struct {
@@ -317,6 +318,15 @@ example: simpleDict hello
 		os.Exit(1)
 	}
 	word := os.Args[1]
-	query(word)
-	queryWithBaidu(word)
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		query(word)
+	}()
+	go func() {
+		defer wg.Done()
+		queryWithBaidu(word)
+	}()
+	wg.Wait()
 }
